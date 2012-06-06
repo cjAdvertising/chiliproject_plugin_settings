@@ -24,6 +24,6 @@ Redmine::Plugin.register :chiliproject_plugin_settings do
   author 'cj Advertising, LLC'
   description 'Easily adds plugin settings forms'
   version '0.0.1'
-  url 'http://cjadvertising.com'
+  url 'http://cjadvertising.github.com/chiliproject_plugin_settings/'
   author_url 'http://cjadvertising.com'
 end
