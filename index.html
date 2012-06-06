@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Chiliproject Plugin Settings by cjAdvertising</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Chiliproject Plugin Settings</h1>
+        <p>A settings plugin for your Chiliproject plugins.</p>
+        <p class="view"><a href="https://github.com/cjAdvertising/chiliproject_plugin_settings">View the Project on GitHub <small>cjAdvertising/chiliproject_plugin_settings</small></a></p>
+        <ul>
+          <li><a href="https://github.com/cjAdvertising/chiliproject_plugin_settings/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/cjAdvertising/chiliproject_plugin_settings/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/cjAdvertising/chiliproject_plugin_settings">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Overview</h1>
+
+<p>This plugin makes it easier for your plugin to provide a settings pane for
+project or user settings. It makes a few assumptions currently:</p>
+
+<ul>
+<li><p>You are setting up a project module in your <code>init.rb</code>.</p></li>
+<li><p>You have a controller named after your project modules, or 
+don't mind creating one.</p></li>
+</ul><h2>Integration</h2>
+
+<p>Clone/download the plugin into <code>vendors/plugins/chiliproject_plugin_settings</code>.</p>
+
+<p>Add the following to your plugin's <code>init.rb</code>, using <code>example</code> as an example 
+project module name: </p>
+
+<div class="highlight">
+<pre><span class="no">Redmine</span><span class="o">::</span><span class="no">Plugin</span><span class="o">.</span><span class="n">register</span> <span class="ss">:my_example_plugin</span> <span class="k">do</span>
+  <span class="nb">name</span> <span class="s1">'An example plugin'</span>
+  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+
+
+  <span class="n">project_module</span> <span class="ss">:example</span> <span class="k">do</span>
+    <span class="n">permission</span> <span class="ss">:view_example</span><span class="p">,</span> <span class="p">{</span><span class="ss">:example</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:index</span><span class="p">,</span> <span class="ss">:show</span><span class="o">]</span><span class="p">}</span>
+
+    <span class="c1"># Add a permission for the project settings</span>
+    <span class="n">permission</span> <span class="ss">:manage_example</span><span class="p">,</span> <span class="p">{</span><span class="ss">:example</span> <span class="o">=&gt;</span> <span class="ss">:project_settings</span><span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nb">require</span> <span class="s2">"dispatcher"</span>
+<span class="no">Dispatcher</span><span class="o">.</span><span class="n">to_prepare</span> <span class="ss">:my_example_plugin</span> <span class="k">do</span>
+
+  <span class="n">require_dependency</span> <span class="s2">"chiliproject_plugin_settings"</span>
+
+  <span class="c1"># Register the example module with the settings plugin for projects only</span>
+  <span class="no">ChiliprojectPluginSettings</span><span class="o">.</span><span class="n">register</span> <span class="ss">:example</span><span class="p">,</span> <span class="ss">:project</span>
+
+  <span class="c1"># To enable for both project and user settings:</span>
+  <span class="c1"># ChiliprojectPluginSettings.register :example, [:project, :user]</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>In your project module's controller (<code>ExampleController</code> in this example), 
+add the following:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">ExampleController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+
+  <span class="c1"># Be sure to exclude any before_filters:</span>
+  <span class="c1"># before_filter :find_project, :exclude =&gt; [:project_settings, :user_settings]</span>
+
+  <span class="c1"># Include the settings plugin actions and helpers</span>
+  <span class="kp">include</span> <span class="no">ChiliprojectPluginSettingsHelper</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Add a model named for the module and settings type (<code>Project</code> or <code>User</code>):</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">ExampleProjectSettings</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">belongs_to</span> <span class="ss">:project</span>
+  <span class="n">validates_presence_of</span> <span class="ss">:project</span><span class="p">,</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:content</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Add a migration for your new model:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">CreateExampleProjectSettings</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">up</span>
+    <span class="n">create_table</span> <span class="ss">:example_project_settings</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">column</span> <span class="ss">:project_id</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">column</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">:limit</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">column</span> <span class="ss">:content</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">:limit</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>
+    <span class="k">end</span>
+    <span class="n">add_index</span> <span class="ss">:example_project_settings</span><span class="p">,</span> <span class="ss">:project_id</span><span class="p">,</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:example_project_settings_project_id</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">down</span>
+    <span class="n">drop_table</span> <span class="ss">:example_project_settings</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Create a form view template named after your project module 
+(<code>app/views/projects/settings/_example.rhtml</code> in this example):</p>
+
+<div class="highlight">
+<pre><span class="cp">&lt;%</span> <span class="n">remote_form_for</span> <span class="ss">:example_project_settings</span><span class="p">,</span> <span class="no">ExampleProjectSettings</span><span class="o">.</span><span class="n">find_by_project_id</span><span class="p">(</span><span class="vi">@project</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                   <span class="ss">:url</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:controller</span> <span class="o">=&gt;</span> <span class="s1">'example'</span><span class="p">,</span> <span class="ss">:action</span> <span class="o">=&gt;</span> <span class="s1">'project_settings'</span><span class="p">,</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="vi">@project</span> <span class="p">},</span>
+                   <span class="ss">:builder</span> <span class="o">=&gt;</span> <span class="no">TabularFormBuilder</span><span class="p">,</span>
+                   <span class="ss">:lang</span> <span class="o">=&gt;</span> <span class="n">current_language</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="cp">%&gt;</span>
+
+<span class="cp">&lt;%=</span> <span class="n">error_messages_for</span> <span class="s1">'example_project_settings'</span> <span class="cp">%&gt;</span>
+
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"box tabular"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;p&gt;</span>
+    <span class="cp">&lt;%=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:required</span> <span class="o">=&gt;</span> <span class="kp">true</span> <span class="cp">%&gt;</span>
+  <span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;p&gt;</span>
+    <span class="cp">&lt;%=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:content</span><span class="p">,</span> <span class="ss">:required</span> <span class="o">=&gt;</span> <span class="kp">true</span> <span class="cp">%&gt;</span>
+  <span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="cp">&lt;%=</span> <span class="n">submit_tag</span><span class="p">(</span><span class="n">l</span><span class="p">(</span><span class="ss">:button_save</span><span class="p">))</span> <span class="cp">%&gt;</span>
+
+<span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span>
+</pre>
+</div>
+
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/cjAdvertising">cjAdvertising</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
