@@ -54,7 +54,6 @@ module ChiliprojectPluginSettingsHelper
   # Returns nothing.
   def update_or_create_settings(module_name, key_name, extra_attrs = {})
     params_name = "#{module_name}_#{key_name}_settings"
-    Rails.logger.info "******* Params name: #{params_name}"
     inst_var_name = "@#{params_name}"
     partial_name = "#{key_name.to_s.pluralize}/settings/#{module_name}"
     tab_name = "tab-content-#{module_name}"
