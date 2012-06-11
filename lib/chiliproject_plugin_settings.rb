@@ -1,6 +1,7 @@
 
 module ChiliprojectPluginSettings
   def self.settings_tabs(key_name)
+    @@registered ||= {}
     @@registered.select { |m, k| k.include? key_name.to_sym }.keys.map do |m|
       { :name => m.to_s, :partial => "#{key_name.to_s.pluralize}/settings/#{m}", :label => "label_#{m}".to_sym }
     end
