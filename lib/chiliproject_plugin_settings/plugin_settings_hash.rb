@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 module ChiliprojectPluginSettings
   class PluginSettingsHash
     def initialize(object_name, object)

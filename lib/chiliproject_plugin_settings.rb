@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'redmine'
 require 'chiliproject_plugin_settings/plugin_settings_hash'
 require 'chiliproject_plugin_settings/patches/base'

@@ -6,9 +6,6 @@ project or user settings. It makes a few assumptions currently:
 
 * You are setting up a project module in your `init.rb`.
 
-* You have a controller named after your project modules, or 
-  don't mind creating one.
-
 
 Integration
 ===========
@@ -19,66 +16,46 @@ Add the following to your plugin's `init.rb`, using `example` as an example
 project module name: 
 
 ```ruby
-Redmine::Plugin.register :my_example_plugin do
+# vendor/plugins/chiliproject_example/init.rb
+Redmine::Plugin.register :chiliproject_example do
   name 'An example plugin'
-  ...
-
+  # ...
 
   project_module :example do
     permission :view_example, {:example => [:index, :show]}
 
-    # Add a permission for the project settings
+    # Add a permission for the project settings.
     permission :manage_example, {:example => :project_settings}
   end
-end
 
-require "dispatcher"
-Dispatcher.to_prepare :my_example_plugin do
-
-  require_dependency "chiliproject_plugin_settings"
-
-  # Register the example module with the settings plugin for projects only
-  ChiliprojectPluginSettings.register :example, :project
-
-  # To enable for both project and user settings:
-  # ChiliprojectPluginSettings.register :example, [:project, :user]
-end
-```
-
-In your project module's controller (`ExampleController` in this example), 
-add the following:
-
-```ruby
-class ExampleController < ApplicationController
-
-  # Be sure to exclude any before_filters:
-  # before_filter :find_project, :exclude => [:project_settings, :user_settings]
-
-  # Include the settings plugin actions and helpers
-  include ChiliprojectPluginSettingsHelper
+  # Register the project settings for the example module.
+  requires_redmine_plugin :chiliproject_plugin_settings, '0.0.1'
+  project_settings :example
 end
 ```
 
 Add a model named for the module and settings type (`Project` or `User`):
 
 ```ruby
+# vendor/plugins/chiliproject_example/app/models/example_project_settings.rb
 class ExampleProjectSettings < ActiveRecord::Base
   belongs_to :project
-  validates_presence_of :project, :name, :content
+  validates_presence_of :project
 end
 ```
 
 Add a migration for your new model:
 
 ```ruby
+# vendor/plugins/chiliproject_example/db/migrate/20120825011011_create_example_project_settings.rb
 class CreateExampleProjectSettings < ActiveRecord::Migration
   def self.up
     create_table :example_project_settings do |t|
-      t.column :project_id, :integer, :null => false
-      t.column :name, :string, :limit => 100, :null => false
-      t.column :content, :string, :limit => 100, :null => false
+      t.integer :project_id, :null => false
+      t.string :name
+      t.string :content
     end
-    add_index :example_project_settings, :project_id, :name => :example_project_settings_project_id
+    add_index :example_project_settings, :project_id
   end
 
   def self.down
@@ -91,19 +68,17 @@ Create a form view template named after your project module
 (`app/views/projects/settings/_example.rhtml` in this example):
 
 ```rhtml
-<% remote_form_for :example_project_settings, ExampleProjectSettings.find_by_project_id(@project.id),
-                   :url => { :controller => 'example', :action => 'project_settings', :id => @project },
-                   :builder => TabularFormBuilder,
-                   :lang => current_language do |f| %>
+<# vendor/plugins/chiliproject_example/app/views/projects/settings/_example.rhtml #>
+<% project_plugin_settings_form_for :example do |f| %>
 
-<%= error_messages_for 'example_project_settings' %>
+<%= project_plugin_settings_error_messages_for :example %>
 
 <div class="box tabular">
   <p>
-    <%= f.text_field :name, :required => true %>
+    <%= f.text_field :name %>
   </p>
   <p>
-    <%= f.text_field :content, :required => true %>
+    <%= f.text_field :content %>
   </p>
 </div>
 
