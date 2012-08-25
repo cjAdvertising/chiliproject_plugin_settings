@@ -68,7 +68,7 @@ Create a form view template named after your project module
 (`app/views/projects/settings/_example.rhtml` in this example):
 
 ```rhtml
-<# vendor/plugins/chiliproject_example/app/views/projects/settings/_example.rhtml #>
+<%# vendor/plugins/chiliproject_example/app/views/projects/settings/_example.rhtml #>
 <% project_plugin_settings_form_for :example do |f| %>
 
 <%= project_plugin_settings_error_messages_for :example %>
