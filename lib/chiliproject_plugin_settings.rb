@@ -5,8 +5,9 @@ require 'chiliproject_plugin_settings/plugin_settings_hash'
 require 'chiliproject_plugin_settings/patches/base'
 require 'chiliproject_plugin_settings/patches/plugin'
 require 'chiliproject_plugin_settings/patches/project'
-require 'chiliproject_plugin_settings/patches/user'
+require 'chiliproject_plugin_settings/patches/projects_controller'
 require 'chiliproject_plugin_settings/patches/projects_helper'
+require 'chiliproject_plugin_settings/patches/user'
 require 'chiliproject_plugin_settings/patches/users_helper'
 
 module ChiliprojectPluginSettings

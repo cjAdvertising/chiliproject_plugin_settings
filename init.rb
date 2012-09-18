@@ -13,11 +13,12 @@ Redmine::Plugin.register :chiliproject_plugin_settings do
   author_url 'http://cjadvertising.com'
 
   ChiliprojectPluginSettings::Patches::Plugin.patch
-end
 
-Dispatcher.to_prepare :chiliproject_plugin_settings do
-  ChiliprojectPluginSettings::Patches::Project.patch
-  ChiliprojectPluginSettings::Patches::ProjectsHelper.patch
-  ChiliprojectPluginSettings::Patches::User.patch
-  ChiliprojectPluginSettings::Patches::UsersHelper.patch
+  Dispatcher.to_prepare :chiliproject_plugin_settings do
+    ChiliprojectPluginSettings::Patches::Project.patch
+    ChiliprojectPluginSettings::Patches::ProjectsHelper.patch
+    ChiliprojectPluginSettings::Patches::ProjectsController.patch
+    ChiliprojectPluginSettings::Patches::User.patch
+    ChiliprojectPluginSettings::Patches::UsersHelper.patch
+  end
 end

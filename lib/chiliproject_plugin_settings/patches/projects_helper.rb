@@ -11,7 +11,6 @@ module ChiliprojectPluginSettings
 
       def self.included(base)
         base.send(:include, InstanceMethods)
-        base.send(:include, PluginSettingsHelper)
         base.class_eval do
           alias_method_chain :project_settings_tabs, :plugin_settings
         end
