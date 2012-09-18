@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 module PluginSettingsHelper
+  unloadable
+  
   def plugin_settings_form_for(module_name, object_name, form_options={}, &block)
     object = instance_variable_get "@#{object_name}"
     options = ChiliprojectPluginSettings.settings_options module_name, object_name
