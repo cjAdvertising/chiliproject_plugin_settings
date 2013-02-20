@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-require 'redmine'
-require 'dispatcher'
 require 'chiliproject_plugin_settings'
 
 Redmine::Plugin.register :chiliproject_plugin_settings do
@@ -11,14 +7,12 @@ Redmine::Plugin.register :chiliproject_plugin_settings do
   version '0.0.1'
   url 'https://github.com/cjAdvertising/chiliproject_plugin_settings'
   author_url 'http://cjadvertising.com'
+end
 
-  ChiliprojectPluginSettings::Patches::Plugin.patch
-
-  Dispatcher.to_prepare :chiliproject_plugin_settings do
-    ChiliprojectPluginSettings::Patches::Project.patch
-    ChiliprojectPluginSettings::Patches::ProjectsHelper.patch
-    ChiliprojectPluginSettings::Patches::ProjectsController.patch
-    ChiliprojectPluginSettings::Patches::User.patch
-    ChiliprojectPluginSettings::Patches::UsersHelper.patch
-  end
+RedmineApp::Application.config.to_prepare do
+  Project.send :include, ChiliprojectPluginSettings::Patches::Project
+  ProjectsHelper.send :include, ChiliprojectPluginSettings::Patches::ProjectsHelper
+  ProjectsController.send :include, ChiliprojectPluginSettings::Patches::ProjectsController
+  User.send :include, ChiliprojectPluginSettings::Patches::User
+  UsersHelper.send :include, ChiliprojectPluginSettings::Patches::UsersHelper
 end

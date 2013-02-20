@@ -3,17 +3,11 @@
 module ChiliprojectPluginSettings
   module Patches
     module ProjectsHelper
-      extend Base
+      extend ActiveSupport::Concern
 
-      def self.target
-        ::ProjectsHelper
-      end
-
-      def self.included(base)
-        base.send(:include, InstanceMethods)
-        base.class_eval do
-          alias_method_chain :project_settings_tabs, :plugin_settings
-        end
+      included do 
+        include InstanceMethods
+        alias_method_chain :project_settings_tabs, :plugin_settings
       end
 
       module InstanceMethods

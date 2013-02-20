@@ -3,11 +3,7 @@
 module ChiliprojectPluginSettings
   module Patches
     module Project
-      extend Base
-
-      def self.target
-        ::Project
-      end
+      extend ActiveSupport::Concern
 
       module InstanceMethods
 

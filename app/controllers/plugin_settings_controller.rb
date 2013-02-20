@@ -3,6 +3,8 @@
 class PluginSettingsController < ApplicationController
   unloadable
 
+  include ActionView::Helpers::JavaScriptHelper
+
   def update
 
     # Find object (Project/User) by object_id.
@@ -34,8 +36,11 @@ class PluginSettingsController < ApplicationController
     end
 
     # Render settings partial.
-    render(:update) do |page|
-      page.replace_html "tab-content-#{params[:module_name]}", :partial => options[:partial]
-    end
+    rstr = render_to_string partial: options[:partial]
+    # render(:update) do |page|
+    #   page.replace_html "tab-content-#{params[:module_name]}", :partial => options[:partial]
+    # end
+    render :js => "jQuery(function($) { $('tab-content-#{params[:module_name]}').html('#{escape_javascript rstr}'); });"
+
   end
 end

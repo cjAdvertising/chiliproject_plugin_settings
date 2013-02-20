@@ -3,11 +3,7 @@
 module ChiliprojectPluginSettings
   module Patches
     module Plugin
-      extend Base
-
-      def self.target
-        Redmine::Plugin
-      end
+      extend ActiveSupport::Concern
 
       module InstanceMethods
 

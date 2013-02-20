@@ -1,8 +1,8 @@
 # encoding: utf-8
 
 require 'redmine'
+require 'active_support/concern'
 require 'chiliproject_plugin_settings/plugin_settings_hash'
-require 'chiliproject_plugin_settings/patches/base'
 require 'chiliproject_plugin_settings/patches/plugin'
 require 'chiliproject_plugin_settings/patches/project'
 require 'chiliproject_plugin_settings/patches/projects_controller'
@@ -11,6 +11,7 @@ require 'chiliproject_plugin_settings/patches/user'
 require 'chiliproject_plugin_settings/patches/users_helper'
 
 module ChiliprojectPluginSettings
+  Redmine::Plugin.send :include, ChiliprojectPluginSettings::Patches::Plugin
 
   @@registered = {}
 

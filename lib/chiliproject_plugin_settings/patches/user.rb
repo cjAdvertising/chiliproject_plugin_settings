@@ -3,11 +3,7 @@
 module ChiliprojectPluginSettings
   module Patches
     module User
-      extend Base
-
-      def self.target
-        ::User
-      end
+      extend ActiveSupport::Concern
 
       module InstanceMethods
 

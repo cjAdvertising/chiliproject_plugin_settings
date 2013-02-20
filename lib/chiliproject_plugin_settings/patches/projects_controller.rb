@@ -3,16 +3,10 @@
 module ChiliprojectPluginSettings
   module Patches
     module ProjectsController
-      extend Base
+      extend ActiveSupport::Concern
 
-      def self.target
-        ::ProjectsController
-      end
-
-      def self.included(base)
-        base.class_eval do
-          helper :plugin_settings
-        end
+      included do
+        helper :plugin_settings
       end
     end
   end
